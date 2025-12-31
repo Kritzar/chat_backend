@@ -17,11 +17,11 @@ app.use(express.urlencoded());
 app.use(cors());
 app.use(helmet());
 const adapter = new PrismaMariaDb({
-    host: process.env.DATABASE_HOST || '47.129.54.96',
-    port: parseInt(process.env.DATABASE_PORT || '3306'),
-    user: process.env.DATABASE_USER || 'test',
-    password: process.env.DATABASE_PASSWORD || 'Kriti1234',
-    database: process.env.DATABASE_NAME || 'chat',
+    host: process.env.DATABASE_HOST,
+    port: parseInt(process.env.DATABASE_PORT ),
+    user: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME ,
 });
 const prisma = new PrismaClient({ adapter });
 app.get("/", (req, res) => {
