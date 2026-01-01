@@ -6,7 +6,6 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import crypto from "crypto";
 dotenv.config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
 class MainController {
     static handleGeminiChat = async (req, res) => {
         const { message, sessionId } = req.body;
@@ -19,13 +18,11 @@ class MainController {
         else {
             try {
                 const uuid = sessionId || crypto.randomUUID();
-                
                 await prisma.conversation.upsert({
                     where: { id: uuid },
-                    update: {}, // Do nothing if it exists
+                    update: {},
                     create: { id: uuid }
                 });
-                
                 await prisma.message.create({
                     data: {
                         conversationId: uuid,
@@ -33,18 +30,15 @@ class MainController {
                         content: message
                     }
                 });
-               
                 const rows = await prisma.message.findMany({
                     where: { conversationId: uuid },
                     orderBy: { createdAt: 'asc' },
                     take: 3
                 });
-                
                 const history = rows.slice(0, -1).map((msg) => ({
                     role: msg.sender === 'user' ? 'user' : 'model', // FIXED: 'ai' -> 'model'
                     parts: [{ text: msg.content }],
                 }));
-                // 6. Gemini API Call
                 console.log("--- OUTGOING API CALL AT:", new Date().toISOString());
                 const chat = genAI.getGenerativeModel({
                     model: "gemini-2.5-flash-lite",
@@ -55,32 +49,26 @@ class MainController {
                 async function callGeminiWithRetry(chat, message, maxRetries = 3) {
                     for (let i = 0; i < maxRetries; i++) {
                         try {
-                            // Attempt the message
                             const result = await chat.sendMessage(message);
                             return result.response.text();
                         }
                         catch (error) {
-                           
                             if (error.status === 429 || error.message?.includes('429')) {
-                               
                                 const delayStr = error.response?.errorDetails?.find((d) => d['@type']?.includes('RetryInfo'))?.retryDelay;
-                               
                                 const waitTime = delayStr ? parseInt(delayStr) * 1000 : 30000;
                                 console.warn(`Rate limit hit. Waiting ${waitTime / 1000} seconds before retry ${i + 1}...`);
                                 await new Promise(resolve => setTimeout(resolve, waitTime));
-                                continue; // Try again after waiting
+                                continue;
                             }
-                           
                             throw error;
                         }
                     }
                     return null;
                 }
-                
+                //const result = await chat.sendMessage(message); 
                 const aiReply = await callGeminiWithRetry(chat, message);
                 // const aiReply = response.text;
                 console.log("--- OUTGOING API CALL AT:", new Date().toISOString());
-                // 7. Save AI Response
                 if (aiReply) {
                     await prisma.message.create({
                         data: {
@@ -89,7 +77,6 @@ class MainController {
                             content: aiReply
                         }
                     });
-                   
                     res.json({ reply: aiReply, sessionId: uuid });
                 }
             }
