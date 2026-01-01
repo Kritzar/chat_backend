@@ -8,6 +8,6 @@ export default defineConfig({
         path: "prisma/migrations",
     },
     datasource: {
-        url: process.env["DATABASE_URL"] || "mysql://test:Kriti1234@47.129.54.96:3306/chat",
+        url: process.env["DATABASE_URL"],
     },
 });
