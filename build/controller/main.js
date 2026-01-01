@@ -7,6 +7,7 @@ import crypto from "crypto";
 dotenv.config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+class MainController {
     static handleGeminiChat = async (req, res) => {
         const { message, sessionId } = req.body;
         if (!message || message.length > 1000) {
