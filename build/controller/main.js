@@ -59,17 +59,17 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
                             return result.response.text();
                         }
                         catch (error) {
-                            // Check if it's a 429 (Rate Limit) error
+                           
                             if (error.status === 429 || error.message?.includes('429')) {
-                                // Try to extract the retryDelay from the error object
+                               
                                 const delayStr = error.response?.errorDetails?.find((d) => d['@type']?.includes('RetryInfo'))?.retryDelay;
-                                // Convert '23s' to 23000ms, or fallback to 30s
+                               
                                 const waitTime = delayStr ? parseInt(delayStr) * 1000 : 30000;
                                 console.warn(`Rate limit hit. Waiting ${waitTime / 1000} seconds before retry ${i + 1}...`);
                                 await new Promise(resolve => setTimeout(resolve, waitTime));
                                 continue; // Try again after waiting
                             }
-                            // If it's not a 429, throw the error normally
+                           
                             throw error;
                         }
                     }
@@ -84,7 +84,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
                     await prisma.message.create({
                         data: {
                             conversationId: uuid,
-                            sender: 'model', // Matches Gemini role for consistency
+                            sender: 'model', 
                             content: aiReply
                         }
                     });
