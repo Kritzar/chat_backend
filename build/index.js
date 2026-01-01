@@ -38,7 +38,7 @@ cron.schedule('0 0 * * *', async () => {
         const deletedMessages = await prisma.message.deleteMany({
             where: {
                 createdAt: {
-                    lt: new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours ago
+                    lt: new Date(Date.now() - 24 * 60 * 60 * 1000) 
                 }
             }
         });
