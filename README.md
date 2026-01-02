@@ -12,7 +12,7 @@ Safe Interaction:
 
 Rate Limiting: Restricts users to 6 messages per minute to prevent API abuse.
 
-Total Message Cap: Limits users to 30 messages per session, directing them to official contact details thereafter.
+Total Message Cap: Limits users to 20 messages per session, directing them to official contact details thereafter.
 
 Auto-Scroll: Smoothly scrolls to the latest message whenever the chat updates.
 
